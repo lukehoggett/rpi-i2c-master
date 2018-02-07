@@ -1,7 +1,9 @@
 'use strict';
 
 console.info(`start...`);
-const rpio = require('rpio');
+// const rpio = require('rpio');
+
+const i2c = require('i2c');
 
 // let options = {
 //   gpiomem: true
@@ -19,14 +21,15 @@ const DATA_BLUE = 0x02;
 const colors = [DATA_RED, DATA_GREEN, DATA_BLUE];
 
 
+let wire = new i2c(0x20, {device: '/dev/i2c-1', debug: true}); // point to your i2c address, debug provides REPL interface
+wire.scan(function(err, data) {
+  console.info(`scan`, err, data);
+});
+// let beginStatus = rpio.i2cBegin();
+// console.info(`begin status`, beginStatus);
 
-
-
-let beginStatus = rpio.i2cBegin();
-console.info(`begin status`, beginStatus);
-
-rpio.i2cSetSlaveAddress(0x20);
-rpio.i2cSetBaudRate(100000);    /* 100kHz */
+// rpio.i2cSetSlaveAddress(0x20);
+// rpio.i2cSetBaudRate(100000);    /* 100kHz */
 
 let pages = generatePages();
 pages.forEach((page, color) => {
@@ -34,11 +37,17 @@ pages.forEach((page, color) => {
   
   let txBuffer = Buffer.from(page);
   // console.info(txBuffer.toString('hex'));
-  let writeStatus = rpio.i2cWrite(txBuffer, txBuffer.length);
-  console.info(`write status`, writeStatus);
+  // let writeStatus = rpio.i2cWrite(txBuffer, txBuffer.length);
+  // console.info(`write status`, writeStatus);
+  wire.write(txBuffer, (err) => {
+    if (err) {
+      console.error(err);
+    }
+    console.info('write callback');
+  });
   
 });
-rpio.i2cEnd();
+// rpio.i2cEnd();
 /** 
  * We send each color in a seperate message
  * The message is made up of 
