@@ -54,7 +54,7 @@ Which When using a MicroView (https://learn.sparkfun.com/tutorials/microview-hoo
 ```
 RPI               Microview 
 --------------------------------------------
-GPIO 0 (SDA) <--> Pin 3 (SDA)
-GPIO 1 (SCL) <--> Pin 2 (SCL)
+GPIO 0 (SDA) <--> Pin 3 (SDA) Yellow
+GPIO 1 (SCL) <--> Pin 2 (SCL) Green
 Ground       <--> Pin 8 (Ground)
 ```
