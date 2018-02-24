@@ -15,28 +15,30 @@ const colors = [DATA_RED, DATA_GREEN, DATA_BLUE];
 const ADDRESS_1 = 0x20;
 const BAUD_RATE = 100000;
 
-rpio.i2cBegin();
-rpio.i2cSetSlaveAddress(ADDRESS_1);
-rpio.i2cSetBaudRate(BAUD_RATE);    /* 100kHz */
+   /* 100kHz */
 
 function run() {
-  let pages = generatePages();
+  // let pages = generatePages();
+  let pages = generateWords();
   pages.forEach((page, color) => {
+    
+    rpio.i2cBegin();
+    rpio.i2cSetSlaveAddress(ADDRESS_1);
+    rpio.i2cSetBaudRate(BAUD_RATE); 
+    
     console.info(`Writing page ${color}`/*, page, page.length*/);
     
     let txBuffer = Buffer.from(page);
     // console.info(txBuffer.toString('hex'));
     let writeStatus = rpio.i2cWrite(txBuffer, txBuffer.length);
     console.info(`write status`, writeStatus);
-    
-    // let rxSize = 32;
-    // let rxBuffer = Buffer.alloc(rxSize);
-    // let readStatus = rpio.i2cRead(rxBuffer);
-    // console.info(`readStatus`, readStatus, rxBuffer);
+    rpio.usleep(2);
+    rpio.i2cEnd();
+
     
   });
 }
-// rpio.i2cEnd();
+
 /** 
  * We send each color in a seperate message
  * The message is made up of 
@@ -72,7 +74,7 @@ function generatePages() {
   colors.forEach((color, key) => {
     // console.info(color, key);
     data[color] = [];
-    for (var i = 0; i < 64; i++) {
+    for (var i = 0; i < 24; i++) {
       let pixel = randomPrimaryColor();
       data[color].push(pixel);
     }
@@ -82,6 +84,15 @@ function generatePages() {
     // console.info(data, data.length);
     
   });
+  
+  return data;
+}
+
+function generateWords() {
+  let data = [];
+  data[0] = "hello";
+  data[1] = "world";
+  data[2] = "bus";
   
   return data;
 }
